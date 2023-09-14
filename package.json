@@ -17,6 +17,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "format-js": "eslint 'src/**/*.{json,jsx,tsx,ts}' --fix && prettier 'src/**/*.{json,jsx,tsx,ts}' --write",
+    "lint-js": "eslint 'src/**/*.{json,tsx,ts}' && prettier 'src/**/*.{json,tsx,ts}' --check",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -39,5 +41,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.22.15",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.49.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.33.2",
+    "prettier": "^3.0.3",
+    "stylelint": "^15.10.3",
+    "stylelint-order": "^6.0.3",
+    "stylelint-prettier": "^4.0.2"
   }
 }
