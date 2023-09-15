@@ -8,8 +8,9 @@
  */
 
 import React, { FC, useEffect, useRef } from "react";
-import chromeWebm from "./video/chrome.webm";
-import chromeMp4 from "./video/chrome.mp4";
+import chromeWebm from "../assets/chrome.webm";
+import chromeMp4 from "../assets/chrome.mp4";
+import Stats from "./Stats";
 
 interface HTMLVideoElementExtended extends HTMLVideoElement {
   captureStream?(): MediaStream;
@@ -83,7 +84,6 @@ const WebRTCStats: FC = () => {
     if (!receiverVideo) {
       return;
     }
-    console.log("hi there");
     if (receiverVideo.srcObject !== event.streams[0]) {
       receiverVideo.srcObject = event.streams[0];
     }
@@ -154,6 +154,8 @@ const WebRTCStats: FC = () => {
           ></video>
         </div>
       </div>
+      <h2>Receiver Stats</h2>
+      <Stats />
     </>
   );
 };

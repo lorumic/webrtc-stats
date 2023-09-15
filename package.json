@@ -1,33 +1,29 @@
 {
   "name": "webrtc-stats",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^16.18.50",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
+    "chart.js": "^4.4.0",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "lodash.isinteger": "^4.0.4",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "vite": "^4.4.9",
+    "vite-tsconfig-paths": "^4.2.1"
   },
   "scripts": {
     "format-js": "eslint 'src/**/*.{json,jsx,tsx,ts}' --fix && prettier 'src/**/*.{json,jsx,tsx,ts}' --write",
     "lint-js": "eslint 'src/**/*.{json,tsx,ts}' && prettier 'src/**/*.{json,tsx,ts}' --check",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite serve",
+    "build": "vite build --emptyOutDir"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -44,7 +40,10 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.15",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@types/lodash": "^4.14.198",
+    "@typescript-eslint/eslint-plugin": "^6.7.0",
+    "@typescript-eslint/parser": "^6.7.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
