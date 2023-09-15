@@ -1,3 +1,12 @@
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *  Copyright (c) 2023 Michele Lo Russo. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+
 import React, { FC, useEffect, useRef } from "react";
 import chromeWebm from "./video/chrome.webm";
 import chromeMp4 from "./video/chrome.mp4";
