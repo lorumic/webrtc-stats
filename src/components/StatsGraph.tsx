@@ -33,6 +33,9 @@ const StatsGraph: FC<Props> = ({ item }: Props) => {
   > | null> = useRef(null);
 
   const graphId = graphTitleToId(item.title);
+  if (!(graphId in statsHistory)) {
+    return null;
+  }
   const dataPoints = statsHistory[graphId].dataPoints;
   const values = dataPoints.map((dataPoint) => dataPoint.value);
 
@@ -101,22 +104,25 @@ const StatsGraph: FC<Props> = ({ item }: Props) => {
   ChartJS.register(TimeScale, LinearScale, PointElement, LineElement, Tooltip);
 
   return (
-    <div className="graph-wrapper">
-      <Line
-        ref={chartRef}
-        className="graph-canvas"
-        options={graphOptions}
-        datasetIdKey={item.title}
-        data={{
-          labels: dataPoints.map((dataPoint) => dataPoint.timestamp),
-          datasets: [
-            {
-              data: values,
-              pointRadius: 1,
-            },
-          ],
-        }}
-      />
+    <div>
+      {item.title}
+      <div className="graph-wrapper">
+        <Line
+          ref={chartRef}
+          className="graph-canvas"
+          options={graphOptions}
+          datasetIdKey={item.title}
+          data={{
+            labels: dataPoints.map((dataPoint) => dataPoint.timestamp),
+            datasets: [
+              {
+                data: values,
+                pointRadius: 1,
+              },
+            ],
+          }}
+        />
+      </div>
     </div>
   );
 };

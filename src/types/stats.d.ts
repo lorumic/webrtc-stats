@@ -1,14 +1,3 @@
-export interface Stat {
-  name: string;
-  unit?: string;
-  value: number;
-}
-
-export interface StatsGroup {
-  stats: Stat[];
-  title: string;
-}
-
 export interface StatsDataPoint {
   timestamp: number;
   value: number;
@@ -34,7 +23,7 @@ export interface Stats {
     packetsReceived: number;
     packetsLost: number;
   };
-  audioOutput: {
+  audio: {
     bytesReceived: number;
     jitter: number;
     totalSamplesReceived: number;

@@ -1,4 +1,5 @@
 .App {
+  padding-bottom: 2rem;
   text-align: center;
 }
 
@@ -12,4 +13,9 @@
 
 video {
   height: 200px;
+}
+
+.graphs-row {
+  display: flex;
+  justify-content: center;
 }

@@ -13,11 +13,13 @@ export const STATS_UPDATE_INTERVAL = 3000; // ms
 interface StatsContextProps {
   statsHistory: StatsHistory;
   updateStats: (newStats: Stats) => void;
+  resetStatsHistory: () => void;
 }
 
 const initialState: StatsContextProps = {
   statsHistory: {},
   updateStats: () => undefined,
+  resetStatsHistory: () => undefined,
 };
 
 export const StatsContext = createContext<StatsContextProps>(initialState);
@@ -27,8 +29,12 @@ interface StatsProviderProps {
 }
 
 const StatsProvider: FC<StatsProviderProps> = ({ children }) => {
-  const statsHistory = useState<StatsHistory>({})[0];
+  const [statsHistory, setStatsHistory] = useState<StatsHistory>({});
   const [statsVersion, setStatsVersion] = useState(0);
+
+  const resetStatsHistory = () => {
+    setStatsHistory({});
+  };
 
   const updateStats = (newStats: Stats) => {
     const now = Date.now();
@@ -72,6 +78,7 @@ const StatsProvider: FC<StatsProviderProps> = ({ children }) => {
       value={{
         statsHistory,
         updateStats,
+        resetStatsHistory,
       }}
     >
       {children}

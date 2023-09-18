@@ -1,10 +1,6 @@
-import { Stat, Stats, StatsGroup } from "types/stats";
-
-export const GRAPHS_WRAPPER_ID = "graphs-wrapper";
-
 export const STATS_SECTIONS = {
   video: "Video",
-  audioOutput: "Audio",
+  audio: "Audio",
 };
 
 export const statSectionsMap = new Map(Object.entries(STATS_SECTIONS));
@@ -38,79 +34,6 @@ export const formatMb = (v: number) => {
 
 export const formatMs = (v: number) => {
   return +(v * 1000).toFixed(2);
-};
-
-export const getStatsSections = (stats?: Stats) => {
-  if (!stats) {
-    return [];
-  }
-
-  const video: Stat[] = [
-    {
-      name: STATS_LABELS.bytesReceived,
-      value: formatMb(stats.video.bytesReceived),
-      unit: STATS_UNITS.mB,
-    },
-    {
-      name: STATS_LABELS.fps,
-      value: stats.video.fps,
-      unit: STATS_UNITS.fps,
-    },
-    {
-      name: STATS_LABELS.decodeTime,
-      value: formatMs(stats.video.decodeTime),
-      unit: STATS_UNITS.ms,
-    },
-    {
-      name: STATS_LABELS.jitter,
-      value: formatMs(stats.video.jitter),
-      unit: STATS_UNITS.ms,
-    },
-    {
-      name: STATS_LABELS.packetsReceived,
-      value: stats.video.packetsReceived,
-      unit: STATS_UNITS.packets,
-    },
-    {
-      name: STATS_LABELS.packetsLost,
-      value: stats.video.packetsLost,
-      unit: STATS_UNITS.packets,
-    },
-  ];
-
-  const audio: Stat[] = [
-    {
-      name: STATS_LABELS.bytesReceived,
-      value: formatMb(stats.audioOutput.bytesReceived),
-      unit: STATS_UNITS.mB,
-    },
-    {
-      name: STATS_LABELS.jitter,
-      value: formatMs(stats.audioOutput.jitter),
-      unit: STATS_UNITS.ms,
-    },
-    {
-      name: STATS_LABELS.packetsReceived,
-      value: stats.audioOutput.packetsReceived,
-      unit: STATS_UNITS.packets,
-    },
-    {
-      name: STATS_LABELS.packetsLost,
-      value: stats.audioOutput.packetsLost,
-      unit: STATS_UNITS.packets,
-    },
-    {
-      name: STATS_LABELS.totalSamplesReceived,
-      value: stats.audioOutput.totalSamplesReceived,
-    },
-  ];
-
-  const statsSections: StatsGroup[] = [
-    { title: STATS_SECTIONS.video, stats: video },
-    { title: STATS_SECTIONS.audioOutput, stats: audio },
-  ];
-
-  return statsSections;
 };
 
 export const formatValue = (value: number, unit?: string) => {

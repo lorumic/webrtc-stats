@@ -7,10 +7,11 @@
  *  tree.
  */
 
-import React, { FC, useEffect, useRef } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import chromeWebm from "../assets/chrome.webm";
 import chromeMp4 from "../assets/chrome.mp4";
-import Stats from "./Stats";
+import StatsGraphs from "./StatsGraphs";
+import useStats from "hooks/useStats";
 
 interface HTMLVideoElementExtended extends HTMLVideoElement {
   captureStream?(): MediaStream;
@@ -18,13 +19,15 @@ interface HTMLVideoElementExtended extends HTMLVideoElement {
 }
 
 const WebRTCStats: FC = () => {
+  const [stream, setStream] = useState<MediaStream>();
+  const [senderPeer, setSenderPeer] = useState<RTCPeerConnection>();
+  const [receiverPeer, setReceiverPeer] = useState<RTCPeerConnection>();
+  const [isReceiverPlaying, setReceiverPlaying] = useState<boolean>(false);
+
+  const { resetStatsHistory } = useStats();
+
   const senderVideoRef = useRef<HTMLVideoElementExtended>(null);
   const receiverVideoRef = useRef<HTMLVideoElementExtended>(null);
-
-  let stream: MediaStream;
-
-  let senderPeer: RTCPeerConnection;
-  let receiverPeer: RTCPeerConnection;
 
   const offerOptions: RTCOfferOptions = {
     offerToReceiveAudio: true,
@@ -37,10 +40,10 @@ const WebRTCStats: FC = () => {
     }
     const senderVideo = senderVideoRef.current;
     if (senderVideo.captureStream) {
-      stream = senderVideo.captureStream();
+      setStream(senderVideo.captureStream());
       startPeerConnection();
     } else if (senderVideo.mozCaptureStream) {
-      stream = senderVideo.mozCaptureStream();
+      setStream(senderVideo.mozCaptureStream());
       startPeerConnection();
     } else {
       console.log("captureStream() not supported");
@@ -48,35 +51,38 @@ const WebRTCStats: FC = () => {
   };
 
   const startPeerConnection = () => {
-    // Initialise peer connection #1
-    senderPeer = new RTCPeerConnection();
-    senderPeer.onicecandidate = (e) => onIceCandidate(senderPeer, e);
-
-    // Initialise peer connection #2
-    receiverPeer = new RTCPeerConnection();
-    receiverPeer.onicecandidate = (e) => onIceCandidate(receiverPeer, e);
-    receiverPeer.ontrack = gotRemoteStream;
-
-    stream.getTracks().forEach((track) => senderPeer.addTrack(track, stream));
-
-    void senderPeer.createOffer(
-      onCreateOfferSuccess,
-      onCreateSessionDescriptionError,
-      offerOptions,
-    );
+    setSenderPeer(new RTCPeerConnection());
+    setReceiverPeer(new RTCPeerConnection());
   };
+
+  useEffect(() => {
+    if (senderPeer && receiverPeer && stream) {
+      senderPeer.onicecandidate = (e) => onIceCandidate(senderPeer, e);
+
+      receiverPeer.onicecandidate = (e) => onIceCandidate(receiverPeer, e);
+      receiverPeer.ontrack = gotRemoteStream;
+
+      stream.getTracks().forEach((track) => senderPeer.addTrack(track, stream));
+
+      void senderPeer.createOffer(
+        onCreateOfferSuccess,
+        onCreateSessionDescriptionError,
+        offerOptions,
+      );
+    }
+  }, [senderPeer, receiverPeer]);
 
   const onIceCandidate = (
     pc: RTCPeerConnection,
     event: RTCPeerConnectionIceEvent,
   ) => {
     if (event.candidate) {
-      void getOtherPc(pc).addIceCandidate(event.candidate);
+      if (senderPeer && receiverPeer) {
+        void (pc === senderPeer ? receiverPeer : senderPeer).addIceCandidate(
+          event.candidate,
+        );
+      }
     }
-  };
-
-  const getOtherPc = (pc: RTCPeerConnection) => {
-    return pc === senderPeer ? receiverPeer : senderPeer;
   };
 
   const gotRemoteStream = (event: RTCTrackEvent) => {
@@ -90,6 +96,9 @@ const WebRTCStats: FC = () => {
   };
 
   const onCreateOfferSuccess = (desc: RTCSessionDescriptionInit) => {
+    if (!senderPeer || !receiverPeer) {
+      return;
+    }
     void senderPeer.setLocalDescription(desc);
     void receiverPeer.setRemoteDescription(desc);
     void receiverPeer.createAnswer(
@@ -103,6 +112,9 @@ const WebRTCStats: FC = () => {
   };
 
   const onCreateAnswerSuccess = (desc: RTCSessionDescriptionInit) => {
+    if (!senderPeer || !receiverPeer) {
+      return;
+    }
     void receiverPeer.setLocalDescription(desc);
     void senderPeer.setRemoteDescription(desc);
   };
@@ -118,13 +130,15 @@ const WebRTCStats: FC = () => {
         // fired before we registered the event handler.
         maybeCreateStream();
       }
-      senderVideo.onplay = () => {
-        void receiverVideoRef.current?.play();
-      };
-      senderVideo.onpause = () => {
-        receiverVideoRef.current?.pause();
-      };
-      void senderVideo.play();
+      if (receiverVideoRef.current) {
+        const receiverVideo = receiverVideoRef.current;
+        receiverVideo.onplay = () => setReceiverPlaying(true);
+        receiverVideo.onpause = () => setReceiverPlaying(false);
+        senderVideo.onended = () => {
+          receiverVideo.pause();
+          resetStatsHistory();
+        };
+      }
     }
   }, []);
 
@@ -135,7 +149,7 @@ const WebRTCStats: FC = () => {
       <div className="peers-container">
         <div className="video-container">
           <h3>Sender video</h3>
-          <video ref={senderVideoRef} playsInline controls loop autoPlay muted>
+          <video ref={senderVideoRef} playsInline controls>
             <source src={chromeWebm} type="video/webm" />
             <source src={chromeMp4} type="video/mp4" />
             <p>This browser does not support the video element.</p>
@@ -144,18 +158,15 @@ const WebRTCStats: FC = () => {
 
         <div className="video-container">
           <h3>Receiver video</h3>
-          <video
-            ref={receiverVideoRef}
-            playsInline
-            controls
-            loop
-            autoPlay
-            muted
-          ></video>
+          <video ref={receiverVideoRef} playsInline controls />
         </div>
       </div>
       <h2>Receiver Stats</h2>
-      <Stats />
+      {receiverPeer ? (
+        <StatsGraphs targetPeer={receiverPeer} isPlaying={isReceiverPlaying} />
+      ) : (
+        <p>Receiver peer not connected.</p>
+      )}
     </>
   );
 };
